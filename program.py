@@ -1,3 +1,4 @@
+import csv
 import os
 
 
@@ -6,6 +7,7 @@ def main():
     file_name = get_data_file()
     data = load_file(file_name)
     query_data(data)
+
 
 def print_header():
     print('----------------------------------------')
@@ -18,11 +20,35 @@ def get_data_file():
     base_folder = os.path.dirname(__file__)
     return os.path.join(base_folder, 'data', 'SacramentoRealEstateTransactions2008.csv')
 
+
 def load_file(filename):
-    return []
+    with open(filename, 'r', encoding='utf8') as fin:
+        reader = csv.DictReader(fin, delimiter=',')
+        for row in reader:
+            print(row)
+            print("Bed count: {}".format(row['beds']))
+            # header = fin.readline().strip()
+            # reader = csv.reader(fin, delimiter=',' )
+            # for row in reader:
+            #     print(type(row), row)
+
+
+def load_file_basic(filename):
+    with open(filename, 'r', encoding='utf8') as fin:
+        header = fin.readline().strip()
+        print("found header: " + header)
+        lines = []
+
+        for line in fin:
+            line_data = line.strip().split(',')
+            bed_count = line_data[4]
+            lines.append(line_data)
+        print(lines[:5])
+
 
 def query_data(data):
     pass
+
 
 if __name__ == '__main__':
     main()
