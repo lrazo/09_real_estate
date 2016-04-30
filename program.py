@@ -90,15 +90,21 @@ def query_data(data):  # list[Purchase]):
     #     if pur.beds == 2:
     #         prices.append(pur.price)
 
-    two_beds_homes = [
+    two_beds_homes = (
         p  # projection or items
         for p in data  # the set to process
         if announce(p, '2-bedrooms, found {}'.format(p.beds)) and p.beds == 2  # test / condition
-        ]
+    )
 
-    avg_price = statistics.mean([announce(p.price, 'price') for p in two_beds_homes[:5]])
-    avg_baths = statistics.mean([p.baths for p in two_beds_homes])
-    avg_sqft = statistics.mean([p.sq__ft for p in two_beds_homes])
+    homes = []
+    for h in two_beds_homes:
+        if len(homes) > 5:
+            break
+        homes.append(h)
+
+    avg_price = statistics.mean((announce(p.price, 'price') for p in homes))
+    avg_baths = statistics.mean((p.baths for p in homes))
+    avg_sqft = statistics.mean((p.sq__ft for p in homes))
     print("The average of a 2-bedroom home price is ${:,}, baths={}, sq ft={:,}".format(int(avg_price),
                                                                                         round(avg_baths, 1),
                                                                                         round(avg_sqft, 1)))
