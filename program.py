@@ -1,6 +1,10 @@
 import csv
 import os
-import statistics
+
+try:
+    import statistics
+except:
+    import statistics_standin_for_py2 as statistics
 
 from data_types import Purchase
 
@@ -25,12 +29,13 @@ def get_data_file():
 
 
 def load_file(filename):
-    with open(filename, 'r', encoding='utf8') as fin:
+    # with open(filename, 'r', encoding='utf8') as fin:
+    with open(filename, 'r') as fin:
         reader = csv.DictReader(fin, delimiter=',')
         purchases = []
         for row in reader:
-            #print(row)
-            #print("Bed count: {}".format(row['beds']))
+            # print(row)
+            # print("Bed count: {}".format(row['beds']))
             p = Purchase.create_from_dict(row)
             purchases.append(p)
         return purchases
@@ -67,21 +72,41 @@ def query_data(data):  # list[Purchase]):
     print("The least expensive house is ${:,} with {} beds and {} baths".format(low_purchase.price, low_purchase.beds,
                                                                                 low_purchase.baths))
     # average price house
-    prices = []
-    for pur in data:
-        prices.append(pur.price)
+    # prices = []
+    # for pur in data:
+    #    prices.append(pur.price)
+
+    prices = [
+        p.price  # projection or items
+        for p in data  # the set to process
+        ]
 
     avg_price = statistics.mean(prices)
     print("The average home price is ${:,}".format(int(avg_price)))
 
     # average price house of 2 bedroom houses
-    prices = []
-    for pur in data:
-        if pur.beds == 2:
-            prices.append(pur.price)
+    # prices = []
+    # for pur in data:
+    #     if pur.beds == 2:
+    #         prices.append(pur.price)
 
-    avg_price = statistics.mean(prices)
-    print("The average of a 2-bedroom home price is ${:,}".format(int(avg_price)))
+    two_beds_homes = [
+        p  # projection or items
+        for p in data  # the set to process
+        if announce(p, '2-bedrooms, found {}'.format(p.beds)) and p.beds == 2  # test / condition
+        ]
+
+    avg_price = statistics.mean([announce(p.price, 'price') for p in two_beds_homes[:5]])
+    avg_baths = statistics.mean([p.baths for p in two_beds_homes])
+    avg_sqft = statistics.mean([p.sq__ft for p in two_beds_homes])
+    print("The average of a 2-bedroom home price is ${:,}, baths={}, sq ft={:,}".format(int(avg_price),
+                                                                                        round(avg_baths, 1),
+                                                                                        round(avg_sqft, 1)))
+
+
+def announce(item, msg):
+    print("Pulling item {} for {}".format(item, msg))
+    return item
 
 
 if __name__ == '__main__':
